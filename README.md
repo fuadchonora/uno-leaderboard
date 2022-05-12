@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# UNO Leaderboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A UNO score calculator, useful when you're playing UNO with your friends
 
 ## Available Scripts
 
