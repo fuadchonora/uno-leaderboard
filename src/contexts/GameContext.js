@@ -2,7 +2,13 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Pages
 import HomePage from '../pages/HomePage';
-import PlayerCountPage from '../pages/PlayerCountPage';
+import NewGamePage from '../pages/NewGamePage';
+import AddPlayerPage from '../pages/AddPlayerPage';
+import RoundStartPage from '../pages/RoundStartPage';
+import RoundProgressPage from '../pages/RoundProgressPage';
+import AddScoresPage from '../pages/AddScoresPage';
+import RoundBoardPage from '../pages/RoundBoardPage';
+import FinalBoardPage from '../pages/FinalBoardPage';
 
 const GameContext = createContext();
 
@@ -14,16 +20,34 @@ const PAGES = {
 	home: {
 		id: 'home',
 		component: HomePage,
-		nextPage(input) {
-			return PAGES.playerCount;
-		},
 	},
-	playerCount: {
-		id: 'playerCount',
-		component: PlayerCountPage,
-		nextPage(input) {
-			return PAGES.home;
-		},
+	newGame: {
+		id: 'newGame',
+		component: NewGamePage,
+	},
+	addPlayer: {
+		id: 'addPlayer',
+		component: AddPlayerPage,
+	},
+	roundStart: {
+		id: 'roundStart',
+		component: RoundStartPage,
+	},
+	roundProgress: {
+		id: 'roundProgress',
+		component: RoundProgressPage,
+	},
+	addScores: {
+		id: 'addScores',
+		component: AddScoresPage,
+	},
+	roundBoard: {
+		id: 'roundBoard',
+		component: RoundBoardPage,
+	},
+	finalBoard: {
+		id: 'finalBoard',
+		component: FinalBoardPage,
 	},
 };
 
@@ -31,19 +55,15 @@ function GameContextProvider({ children }) {
 	const [players, setPlayers] = useState([]);
 	const [game, setGame] = useState({
 		currentPage: PAGES['home'],
-		playerCount: 0,
 		round: 0,
 		startTime: null,
 		finishTime: null,
 	});
 
-	const nextPage = (input) => {
-		const nextPage = game.currentPage.nextPage(input);
-		setGame({ ...game, currentPage: nextPage });
-	};
-
-	const setPlayerCount = (playerCount) => {
-		setGame({ ...game, playerCount });
+	const changePageTo = (pageId) => {
+		console.log('Moving to', pageId);
+		const newPage = PAGES[pageId];
+		setGame({ ...game, currentPage: newPage });
 	};
 
 	const addPlayer = (name) => {
@@ -56,12 +76,18 @@ function GameContextProvider({ children }) {
 	};
 
 	const startGame = () => {
-		setGame({ ...game, round: 1, startTime: Date.now() });
+		setPlayers(players.map((player) => ({ ...player, score: 0, wins: 0 })));
+		setGame({ currentPage: PAGES['newGame'], round: 1, startTime: Date.now(), finishTime: null });
 	};
 
 	const calculate = (newScores) => {
 		//add scores to players
-		const _players = players.map((player) => (player.score += newScores[player.name]));
+		const _players = players.map((player) => {
+			players
+				.filter((_player) => _player.name !== player.name)
+				.forEach((_player) => (player.score += newScores[_player.name]));
+			return player;
+		});
 		setPlayers(_players);
 
 		//check for winner
@@ -70,11 +96,11 @@ function GameContextProvider({ children }) {
 		}
 
 		//else, next round
-		setGame({ ...game, round: game.round + 1 });
+		setGame({ ...game, round: game.round + 1, currentPage: PAGES['roundBoard'] });
 	};
 
 	const finishGame = () => {
-		setGame({ ...game, finishTime: Date.now() });
+		setGame({ ...game, currentPage: PAGES['finalBoard'], finishTime: Date.now() });
 	};
 
 	const getLeaderboard = () => {
@@ -86,9 +112,10 @@ function GameContextProvider({ children }) {
 	}, [game.currentPage]);
 
 	const value = {
+		players,
+		round: game.round,
 		CurrentPageComponent: game.currentPage.component,
-		nextPage,
-		setPlayerCount,
+		changePageTo,
 		addPlayer,
 		removePlayer,
 		startGame,

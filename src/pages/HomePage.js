@@ -5,7 +5,11 @@ import { Button } from '@mui/material';
 import { useGame } from '../contexts/GameContext';
 
 export default function HomePage() {
-	const { nextPage } = useGame();
+	const { startGame } = useGame();
+
+	const handlePlay = (event) => {
+		startGame();
+	};
 
 	return (
 		<div>
@@ -13,7 +17,7 @@ export default function HomePage() {
 			<h1>UNO</h1>
 			<h3>Leaderboard</h3>
 
-			<Button variant="contained" color="primary" onClick={() => nextPage()}>
+			<Button variant="contained" color="primary" onClick={handlePlay}>
 				PLAY
 			</Button>
 		</div>
