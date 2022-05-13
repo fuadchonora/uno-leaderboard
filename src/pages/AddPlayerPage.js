@@ -1,11 +1,17 @@
-import React from 'react';
-import { Button } from '@mui/material';
-import { TextField } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 
 // Context
 import { useGame } from '../contexts/GameContext';
 
+// Components
+import { Header } from '../components/Header';
+import { Button } from '../components/Button';
+import { TextField } from '../components/TextField';
+
 export default function AddPlayerPage() {
+	const [nameExist, setNameExist] = React.useState(false);
 	const [playerName, setPlayerName] = React.useState('');
 
 	const { changePageTo, players, addPlayer } = useGame();
@@ -19,23 +25,46 @@ export default function AddPlayerPage() {
 		changePageTo('newGame');
 	};
 
+	const handleKeyPress = (event) => {
+		if (event.key !== 'Enter') return;
+		if (!nameExist && playerName && playerName.length >= 3) handlePlayerAdd();
+	};
+
+	useEffect(() => {
+		if (players.find((player) => player.name === playerName)) setNameExist(true);
+		else setNameExist(false);
+	}, [playerName, players, nameExist]);
+
 	return (
-		<div>
-			<h2>Player {players.length + 1}</h2>
+		<Stack
+			direction="column"
+			justifyContent="space-evenly"
+			spacing={4}
+			paddingX={4}
+			style={{ minHeight: '100vh' }}
+		>
+			<Header title={`Player ${players.length + 1}`} subtitle="Enter Name" />
 
-			<TextField
-				value={playerName}
-				placeholder="Player Name"
-				inputProps={{ inputMode: 'alphabet', pattern: '[a-z]*' }}
-				onChange={handleInputChange}
-			/>
+			<Stack direction="column" alignItems="center" spacing={1}>
+				<TextField
+					value={playerName}
+					label="Player Name"
+					onChange={handleInputChange}
+					onKeyPress={handleKeyPress}
+					autoFocus
+				/>
+				{nameExist && (
+					<Typography variant="caption" color="error">
+						Name already exists
+					</Typography>
+				)}
+			</Stack>
 
-			<br></br>
-			<br></br>
-
-			<Button variant="contained" color="primary" onClick={handlePlayerAdd}>
-				ADD
-			</Button>
-		</div>
+			<Stack direction="column" alignItems="center" spacing={1}>
+				<Button disabled={nameExist || !playerName || playerName.length < 3} onClick={handlePlayerAdd}>
+					ADD
+				</Button>
+			</Stack>
+		</Stack>
 	);
 }

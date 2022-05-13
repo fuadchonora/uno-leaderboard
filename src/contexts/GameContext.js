@@ -72,6 +72,7 @@ function GameContextProvider({ children }) {
 	};
 
 	const removePlayer = (name) => {
+		console.log('removing player', name);
 		setPlayers(players.filter((player) => player.name !== name));
 	};
 

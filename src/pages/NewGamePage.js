@@ -1,8 +1,15 @@
 import React from 'react';
-import { Button } from '@mui/material';
+import { Stack } from '@mui/material';
+import { IconButton } from '@mui/material';
+import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
 
 // Context
 import { useGame } from '../contexts/GameContext';
+
+// Components
+import { Header } from '../components/Header';
+import { Button } from '../components/Button';
+import { Player } from '../components/Player';
 
 export default function NewGamePage() {
 	const { changePageTo, removePlayer, players } = useGame();
@@ -11,37 +18,35 @@ export default function NewGamePage() {
 		changePageTo('addPlayer');
 	};
 
-	const handleRemoveButton = (event) => {
-		removePlayer(event.target.id);
-	};
-
 	const handleStart = (event) => {
 		changePageTo('roundStart');
 	};
 
 	return (
-		<div>
-			<h2>New Game</h2>
+		<Stack
+			direction="column"
+			justifyContent="space-evenly"
+			spacing={4}
+			paddingX={4}
+			style={{ minHeight: '100vh' }}
+		>
+			<Header title="New Game" subtitle={players.length > 2 ? 'All Players' : 'Add Players'} />
 
-			{players.map((player) => (
-				<h6 key={player.name}>
-					{player.name}
-					<Button id={player.name} variant="contained" color="primary" onClick={handleRemoveButton}>
-						Remove
-					</Button>
-				</h6>
-			))}
+			<Stack direction="column" alignItems="center" spacing={1}>
+				{players.map(({ name }) => (
+					<Player key={name} playerName={name} removePlayer={removePlayer}></Player>
+				))}
 
-			<Button variant="contained" color="primary" onClick={handleAddButton}>
-				Add Player
-			</Button>
+				<IconButton color="primary" onClick={handleAddButton}>
+					<PersonAddAltRoundedIcon />
+				</IconButton>
+			</Stack>
 
-			<br></br>
-			<br></br>
-
-			<Button variant="contained" color="primary" onClick={handleStart}>
-				NEXT
-			</Button>
-		</div>
+			<Stack direction="column" alignItems="center" spacing={1}>
+				<Button disabled={players.length < 3} onClick={handleStart}>
+					NEXT
+				</Button>
+			</Stack>
+		</Stack>
 	);
 }

@@ -1,8 +1,12 @@
 import React from 'react';
-import { Button } from '@mui/material';
+import { Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 
 // Context
 import { useGame } from '../contexts/GameContext';
+
+// Components
+import { Button } from '../components/Button';
 
 export default function HomePage() {
 	const { startGame } = useGame();
@@ -12,14 +16,26 @@ export default function HomePage() {
 	};
 
 	return (
-		<div>
-			<h2>WELCOME</h2>
-			<h1>UNO</h1>
-			<h3>Leaderboard</h3>
+		<Stack
+			direction="column"
+			justifyContent="space-evenly"
+			alignItems="center"
+			spacing={1}
+			style={{ minHeight: '100vh' }}
+		>
+			<Typography variant="h3" component="h2">
+				WELCOME
+			</Typography>
+			<Stack>
+				<Typography variant="h2" component="h2">
+					UNO
+				</Typography>
+				<Typography variant="h4" component="h2">
+					Leaderboard
+				</Typography>
+			</Stack>
 
-			<Button variant="contained" color="primary" onClick={handlePlay}>
-				PLAY
-			</Button>
-		</div>
+			<Button onClick={handlePlay}>PLAY</Button>
+		</Stack>
 	);
 }
